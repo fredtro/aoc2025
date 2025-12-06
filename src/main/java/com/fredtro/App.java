@@ -1,6 +1,6 @@
 package com.fredtro;
 
-import com.fredtro.day02.InvalidIdFinder;
+import com.fredtro.day03.JoltageCalculator;
 
 /**
  * Hello world!
@@ -8,9 +8,6 @@ import com.fredtro.day02.InvalidIdFinder;
 public class App {
 
     public static void main(String[] args) {
-
-       // System.out.println(InvalidIdFinder.getSolutionA());
-        System.out.println(InvalidIdFinder.getSolutionB());
-
+        System.out.println("Hello World!");
     }
 }
