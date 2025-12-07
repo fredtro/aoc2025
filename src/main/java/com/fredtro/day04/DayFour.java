@@ -30,7 +30,6 @@ public class DayFour {
         int rowSize = grid[0].length;
         int count = 0;
         char[][] modifiedGrid = Arrays.stream(grid).map(char[]::clone).toArray(char[][]::new);
-        ;
 
         for (int i = 0; i < grid.length; i++) {
 
@@ -67,7 +66,7 @@ public class DayFour {
                 new Position(currentRow + 1, currentColumn + 1)
             )
             .filter(p -> isValidPosition(p, grid))
-            .map(p -> getCharAtPosition(p, grid, rowSize))
+            .map(p -> getCharAtPosition(p, grid))
             .filter(DayFour::isRoll)
             .count();
     }
@@ -78,7 +77,7 @@ public class DayFour {
             && position.index >= 0 && position.index <= rowSize - 1;
     }
 
-    private static Character getCharAtPosition(Position position, char[][] grid, int rowSize) {
+    private static Character getCharAtPosition(Position position, char[][] grid) {
         try {
             return grid[position.rowNumber][position.index];
         } catch (ArrayIndexOutOfBoundsException e) {
