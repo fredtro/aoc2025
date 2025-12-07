@@ -1,16 +1,21 @@
 package com.fredtro.day01;
 
+import com.fredtro.util.FileReader;
+
 import java.util.List;
 import java.util.Objects;
 
-public class Dial {
+public class DayOne {
 
     // keep default start position as instance default but don't rely on instance state between calls
     private static final int DEFAULT_POSITION = 50;
     private static final int RING_SIZE = 100;
 
-    public int rotateAndCountWhenZero(List<Rotation> rotations) {
-        Objects.requireNonNull(rotations, "rotations must not be null");
+    /**
+     * Count whenever dial is exactly at position 0
+     */
+    public int getResultPartOne() {
+        List<Rotation> rotations = getRotations();
 
         int position = DEFAULT_POSITION;
         int zeroCounter = 0;
@@ -33,7 +38,14 @@ public class Dial {
         return zeroCounter;
     }
 
-    public int rotateAndCountAllZero(List<Rotation> rotations) {
+
+
+    /**
+     *
+     * Count whenever dial crosses or is exactly at position 0
+     */
+    public int getResultPartTwo() {
+        List<Rotation> rotations = getRotations();
         Objects.requireNonNull(rotations, "rotations must not be null");
 
         int position = DEFAULT_POSITION;
@@ -65,4 +77,11 @@ public class Dial {
         return zeroCounter;
     }
 
+    private static List<Rotation> getRotations() {
+        return FileReader.parse("/day01/input.txt",
+            s -> new Rotation(s.substring(0, 1), Integer.parseInt(s.substring(1))));
+    }
+
+    public record Rotation(String direction, Integer distance) {
+    }
 }

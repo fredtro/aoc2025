@@ -1,19 +1,15 @@
 package com.fredtro.day02;
 
 import com.fredtro.util.FileReader;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 
-public class InvalidIdFinder {
+public class DayTwo {
 
-
-    public static long getSolutionA() {
+    public static long getResultPartOne() {
         List<IdRange> ranges = getIdRanges();
 
         return ranges.stream()
@@ -30,7 +26,7 @@ public class InvalidIdFinder {
             .mapToLong(Long::parseLong).sum();
     }
 
-    public static long getSolutionB() {
+    public static long getResultPartTwo() {
         List<IdRange> ranges = getIdRanges();
 
         return ranges.stream()
@@ -57,12 +53,11 @@ public class InvalidIdFinder {
                 return false;
             })
             .mapToLong(Long::parseLong).sum();
-            //.collect(Collectors.joining(", "));
     }
 
 
-    public static List<IdRange> getIdRanges() {
-        return FileReader.parse("/day02/ids.txt")
+    private static List<IdRange> getIdRanges() {
+        return FileReader.parse("/day02/input.txt")
             .stream()
             .flatMap(s -> Arrays.stream(s.split(",")))
             .map(range -> {

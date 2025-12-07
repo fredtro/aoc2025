@@ -1,7 +1,5 @@
 package com.fredtro.util;
 
-import com.fredtro.day01.Rotation;
-
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;

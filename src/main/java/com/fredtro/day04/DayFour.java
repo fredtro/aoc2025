@@ -6,14 +6,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class RemovableRollsCalculator {
+public class DayFour {
 
-    public static int getResultA() {
+    public static int getResultPartOne() {
         var lines = getLines().toArray(char[][]::new);
         return getRemovableRolls(lines).count();
     }
 
-    public static int getResultB() {
+    public static int getResultPartTwo() {
         char[][] grid = getLines().toArray(char[][]::new);
 
         RemovedRollsFromGrid removedRollsFromGrid = new RemovedRollsFromGrid(0, grid);
@@ -26,11 +26,11 @@ public class RemovableRollsCalculator {
         return rollsRemovedTotal;
     }
 
-
     private static RemovedRollsFromGrid getRemovableRolls(char[][] grid) {
         int rowSize = grid[0].length;
         int count = 0;
-        char[][] modifiedGrid = Arrays.stream(grid).map(char[]::clone).toArray(char[][]::new);;
+        char[][] modifiedGrid = Arrays.stream(grid).map(char[]::clone).toArray(char[][]::new);
+        ;
 
         for (int i = 0; i < grid.length; i++) {
 
@@ -68,7 +68,7 @@ public class RemovableRollsCalculator {
             )
             .filter(p -> isValidPosition(p, grid))
             .map(p -> getCharAtPosition(p, grid, rowSize))
-            .filter(RemovableRollsCalculator::isRoll)
+            .filter(DayFour::isRoll)
             .count();
     }
 
@@ -101,5 +101,4 @@ public class RemovableRollsCalculator {
 
     record Position(int rowNumber, int index) {
     }
-
 }

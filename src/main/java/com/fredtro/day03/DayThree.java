@@ -3,48 +3,36 @@ package com.fredtro.day03;
 import com.fredtro.util.FileReader;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
-public class JoltageCalculator {
+public class DayThree {
 
-    public static int getResultA() {
+    public static int getResultPartOne() {
         return getLines().stream()
             .map(String::toCharArray)
-            .map(chars -> {
+            .map(bank -> {
+                List<Element> elements = new ArrayList<>();
+                for (int i = 0; i < bank.length; i++) {
+                    elements.add(new Element(i, bank[i]));
+                }
 
-                // Represent each character with index and value to be able to order by index later
-                List<Element> elements = IntStream.range(0, chars.length)
-                    .mapToObj(i -> new Element(i, chars[i]))
-                    .toList();
+                Element max = Collections.max(elements, Comparator.comparingInt(Element::value));
 
-                // Find global max
-                Element max = elements.stream()
-                    .max(Comparator.comparingInt(Element::value))
-                    .orElseThrow();
+                if (max.index == bank.length - 1) {
+                    elements.remove(max);
+                    return List.of(Collections.max(elements, Comparator.comparingInt(Element::value)), max);
+                } else { // all elements after max
+                    var elementsAfterMax = elements.subList(max.index + 1, elements.size());
 
-                // Determine second element depending on max index
-                // If max is on last position - get max from all but max
-                Element second = (max.index() == chars.length - 1)
-                    ? elements.stream()
-                    .filter(e -> e != max)
-                    .max(Comparator.comparingInt(Element::value))
-                    .orElseThrow()
-                    : elements.stream()
-                    .filter(e -> e.index() > max.index())
-                    .max(Comparator.comparingInt(Element::value))
-                    .orElseThrow();
-
-                return List.of(max, second);
-            })
-            .mapToInt(pair -> {
-                int a = pair.get(0).value() - '0';
-                int b = pair.get(1).value() - '0';
+                    return List.of(max, Collections.max(elementsAfterMax, Comparator.comparingInt(Element::value)));
+                }
+            }).peek(System.out::println).mapToInt(elements -> {
+                int a = elements.getFirst().value - '0';
+                int b = elements.getLast().value - '0';
                 return a * 10 + b;
-            })
-            .sum();
+            }).sum();
     }
 
-    public static long getResultB() {
+    public static long getResultPartTwo() {
         return getLines().stream()
             .map(String::toCharArray)
             .map(chars -> computeResultForLine(chars, 12))
