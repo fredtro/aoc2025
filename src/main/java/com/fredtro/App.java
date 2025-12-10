@@ -1,13 +1,14 @@
 package com.fredtro;
 
-import com.fredtro.day03.JoltageCalculator;
+import com.fredtro.day04.DayFour;
+import com.fredtro.day05.DayFive;
 
 /**
  * Hello world!
  */
 public class App {
 
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+    static void main() {
+        System.out.println("Advent of Code 2025");
     }
 }
