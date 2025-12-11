@@ -14,7 +14,7 @@ public class DayOne {
     /**
      * Count whenever dial is exactly at position 0
      */
-    public int getResultPartOne() {
+    public static int getResultPartOne() {
         List<Rotation> rotations = getRotations();
 
         int position = DEFAULT_POSITION;
@@ -44,7 +44,7 @@ public class DayOne {
      *
      * Count whenever dial crosses or is exactly at position 0
      */
-    public int getResultPartTwo() {
+    public static int getResultPartTwo() {
         List<Rotation> rotations = getRotations();
         Objects.requireNonNull(rotations, "rotations must not be null");
 

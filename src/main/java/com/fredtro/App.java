@@ -1,10 +1,10 @@
 package com.fredtro;
 
-import com.fredtro.day04.DayFour;
-import com.fredtro.day05.DayFive;
+import com.fredtro.day01.DayOne;
+import com.fredtro.day06.DaySix;
 
 /**
- * Hello world!
+ * Advent of Code 2025
  */
 public class App {
 
