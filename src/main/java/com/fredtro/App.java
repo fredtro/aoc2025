@@ -10,6 +10,5 @@ public class App {
 
     static void main() {
         System.out.println("Advent of Code 2025");
-        System.out.println(DaySix.getResultPartTwo());
     }
 }

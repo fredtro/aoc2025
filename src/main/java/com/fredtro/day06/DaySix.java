@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class DaySix {
 
@@ -29,6 +30,7 @@ public class DaySix {
         // last line contains the operations
         List<Operation> operations = lines.removeLast()
             .stream()
+            .map(s -> s.charAt(0))
             .map(Operation::fromSign)
             .toList();
 
@@ -49,30 +51,63 @@ public class DaySix {
 
             result += switch (operation) {
                 case SUM -> DoubleStream.of(column).sum();
-                case MINUS -> DoubleStream.of(column).reduce(0, (a, b) -> a - b);
                 case MULTIPLY -> DoubleStream.of(column).reduce(1, (a, b) -> a * b);
-                case DIVIDE -> DoubleStream.of(column).reduce(1, (a, b) -> a / b);
             };
         }
 
         return result;
     }
 
-    public static long getResultPartTwo() {
+    public static BigInteger getResultPartTwo() {
         List<String> lines = new ArrayList<>(FileReader.read("/day06/input.txt"));
 
         String lastLine = lines.removeLast();
-        Matcher operationMatcher = OPERATION_PATTERN.matcher(lastLine);
-        Map<Integer, ColumnMetadata> columnMetadata = getColumnMetadata(operationMatcher);
+        List<ColumnMetadata> columnMetadata = getColumnMetadata(lastLine);
 
-        Map<ColumnMetadata, List<ColumnValue>> columns = new HashMap<>();
+        List<List<ColumnValue>> columns = getColumnValues(lines, columnMetadata);
 
-        lines.forEach(line -> {
+        BigInteger result = BigInteger.ZERO;
+
+        for (int i = 0; i < columns.size(); i++) {
+
+            ColumnMetadata metadata = columnMetadata.get(i);
+            List<ColumnValue> columnValues = columns.get(i);
+            HashMap<Integer, StringBuilder> resultValues = new HashMap<>();
+
+            for (var columnValue : columnValues) {
+                String currentValue = columnValue.value();
+
+                for (int j = 0; j < currentValue.length(); j++) {
+                    resultValues.computeIfAbsent(j, k -> new StringBuilder()).append(currentValue.charAt(j));
+                }
+            }
+
+            LongStream longStream = resultValues.values().stream().map(StringBuilder::toString)
+                .map(StringUtils::strip)
+                .map(Long::parseLong)
+                .mapToLong(Long::longValue);
+
+            long temp = switch (metadata.operation) {
+                case SUM -> longStream.sum();
+                case MULTIPLY -> longStream.reduce(1, (a, b) -> a * b);
+            };
+
+            result = result.add(BigInteger.valueOf(temp));
+        }
+        
+        return result;
+    }
+
+    private static List<List<ColumnValue>> getColumnValues(List<String> lines, List<ColumnMetadata> columnMetadata) {
+        List<List<ColumnValue>> columns = new ArrayList<>();
+
+        for (String line : lines) {
+
             Matcher valueMatcher = VALUES_PATTERN.matcher(line);
-            int valueCount = 0;
 
+            int columnNumber = 0;
             while (valueMatcher.find()) {
-                var metadata = columnMetadata.get(valueCount);
+                var metadata = columnMetadata.get(columnNumber);
 
                 String value = valueMatcher.group();
 
@@ -82,65 +117,33 @@ public class DaySix {
                     case RIGHT -> StringUtils.leftPad(value, metadata.columnSize(), " ");
                 };
 
-                var columnValue = new ColumnValue(
-                    paddedValue,
-                    alignment
-                );
+                var columnValue = new ColumnValue(paddedValue);
 
-                columns.computeIfAbsent(metadata, k -> new ArrayList<>()).add(columnValue);
-
-                valueCount++;
-            }
-
-        });
-
-        long result = 0;
-        //
-        for (Map.Entry<ColumnMetadata, List<ColumnValue>> entry : columns.entrySet()) {
-
-            ColumnMetadata metadata = entry.getKey();
-            List<ColumnValue> columnValues = entry.getValue();
-            HashMap<Integer, StringBuilder> resultValues = new HashMap<>();
-
-            for (var columnValue : columnValues) {
-
-                String currentValue = columnValue.value();
-
-                for (int i = 0; i < currentValue.length(); i++) {
-                    resultValues.computeIfAbsent(i, k -> new StringBuilder()).append(currentValue.charAt(i));
+                if (columnNumber >= columns.size()) {
+                    columns.add(new ArrayList<>());
                 }
+                columns.get(columnNumber).add(columnValue);
+
+                columnNumber++;
             }
 
-            IntStream intStream = resultValues.values().stream().map(StringBuilder::toString)
-                .map(StringUtils::strip)
-                .map(Integer::parseInt)
-                .mapToInt(Integer::intValue);
-
-            int temp = switch (metadata.operation) {
-                case SUM -> intStream.sum();
-                case MINUS -> intStream.reduce(0, (a, b) -> a - b);
-                case MULTIPLY -> intStream.reduce(1, (a, b) -> a * b);
-                case DIVIDE -> intStream.reduce(1, (a, b) -> a / b);
-            };
-
-            result += temp;
         }
 
-        return result;
+        return columns;
     }
 
-    private static Map<Integer, ColumnMetadata> getColumnMetadata(Matcher operationMatcher) {
-        Map<Integer, ColumnMetadata> columnMetadata = new HashMap<>();
+    private static List<ColumnMetadata> getColumnMetadata(String lastLine) {
+        Matcher operationMatcher = OPERATION_PATTERN.matcher(lastLine);
+        List<ColumnMetadata> columnMetadata = new ArrayList<>();
 
-        int count = 0;
         while (operationMatcher.find()) {
             String group = operationMatcher.group();
-            Operation operation = Operation.fromSign(group.charAt(0) + "");
+            Operation operation = Operation.fromSign(group.charAt(0));
             int columnSize = group.length() - 1;
 
-            columnMetadata.put(count, new ColumnMetadata(operation, columnSize, operationMatcher.start()));
-            count++;
+            columnMetadata.add(new ColumnMetadata(operation, columnSize, operationMatcher.start()));
         }
+
         return columnMetadata;
     }
 
@@ -155,19 +158,12 @@ public class DaySix {
     }
 
     enum Operation {
-        SUM("+"), MINUS("-"), MULTIPLY("*"), DIVIDE("/");
-        private final String sign;
+        SUM, MULTIPLY;
 
-        Operation(String sign) {
-            this.sign = sign;
-        }
-
-        public static Operation fromSign(String sign) {
+        public static Operation fromSign(char sign) {
             return switch (sign) {
-                case "+" -> SUM;
-                case "-" -> MINUS;
-                case "*" -> MULTIPLY;
-                case "/" -> DIVIDE;
+                case '+' -> SUM;
+                case '*' -> MULTIPLY;
                 default -> throw new IllegalStateException("Unexpected value: " + sign);
             };
         }
@@ -177,6 +173,6 @@ public class DaySix {
     record ColumnMetadata(Operation operation, int columnSize, int position) {
     }
 
-    record ColumnValue(String value, Alignment alignment) {
+    record ColumnValue(String value) {
     }
 }
